@@ -1,0 +1,14 @@
+task extract_sales: EXTRACT
+  outputs: sales_raw
+end
+
+task clean_sales: TRANSFORM
+  inputs: sales_raw
+  outputs: sales_clean
+  depends_on: extract_sales
+end
+
+task load_dw: LOAD
+  inputs: sales_clean
+  depends_on: clean_sales
+end

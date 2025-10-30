@@ -1,0 +1,21 @@
+task A: EXTRACT
+  outputs: x
+end
+
+task A: TRANSFORM     # duplicada
+  inputs: x
+  outputs: y
+  depends_on: A
+end
+
+task B: TRANSFORM
+  inputs: z           # z nunca foi produzido
+  outputs: w
+  depends_on: C       # C não existe
+end
+
+task C: TRANSFORM
+  inputs: w
+  outputs: q
+  depends_on: B       # ciclo B <-> C
+end
