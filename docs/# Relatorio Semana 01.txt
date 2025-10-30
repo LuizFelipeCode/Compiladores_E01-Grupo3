@@ -1,0 +1,8 @@
+
+### Divisão de Responsabilidades SEMANA 01
+
+- **Caio Vasconcelos Araújo Figueiredo**: Implementação do código principal (`semantic.py`), construção da Tabela de Símbolos e lógica de verificação semântica
+
+- **Gabriel Oliveira Evangelista Luiz**: Testes de execução com `ok.pipe` e `erros.pipe`, documentação dos resultados e análise dos erros detectados
+
+- **Felipe Prudente Borges**: Criação dos repositórios, estruturação do relatório, revisão teórica sobre análise semântica e padronização do documento acadêmico
