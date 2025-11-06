@@ -37,6 +37,14 @@ class ParserNaive:
     TASK_HEADER = re.compile(r'^\s*task\s+([A-Za-z_][\w]*)\s*:\s*(EXTRACT|TRANSFORM|LOAD)\s*$', re.IGNORECASE)
     KV_LINE = re.compile(r'^\s*(inputs|outputs|depends_on)\s*:\s*(.+)$', re.IGNORECASE)
 
+    @staticmethod
+    def remove_comment(text):
+        """Remove comentários (# ...) de uma linha"""
+        comment_pos = text.find('#')
+        if comment_pos != -1:
+            return text[:comment_pos].strip()
+        return text.strip()
+
     def parse_file(self, path):
         with open(path, "r", encoding="utf-8") as f:
             lines = f.readlines()
@@ -44,7 +52,9 @@ class ParserNaive:
         tasks = []
         cur = None
         for idx, line in enumerate(lines, start=1):
-            line_stripped = line.strip()
+            # Remover comentários antes de processar
+            line_stripped = self.remove_comment(line)
+
             if not line_stripped:
                 continue
             if line_stripped.lower() == "end":
@@ -53,16 +63,17 @@ class ParserNaive:
                     cur = None
                 continue
 
-            m = self.TASK_HEADER.match(line)
+            m = self.TASK_HEADER.match(line_stripped)
             if m:
                 name, kind = m.group(1), m.group(2).upper()
                 cur = Task(name=name, kind=kind, lineno=idx)
                 continue
 
-            m = self.KV_LINE.match(line)
+            m = self.KV_LINE.match(line_stripped)
             if m and cur:
                 key = m.group(1).lower()
-                vals = [v.strip() for v in m.group(2).split(",") if v.strip()]
+                value_part = self.remove_comment(m.group(2))
+                vals = [v.strip() for v in value_part.split(",") if v.strip()]
                 if key == "inputs":
                     cur.inputs.extend(vals)
                 elif key == "outputs":

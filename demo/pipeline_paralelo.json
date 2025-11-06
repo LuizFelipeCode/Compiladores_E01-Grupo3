@@ -1,0 +1,204 @@
+{
+  "metadata": {
+    "compiler": "PipeLang Compiler v0.2",
+    "source_file": "exemplos/pipeline_paralelo.pipe",
+    "generated_at": "2025-11-06T16:54:40.512701",
+    "total_tasks": 8,
+    "format_version": "1.0"
+  },
+  "artifacts": {
+    "app_logs": {
+      "name": "app_logs",
+      "produced_by": "extract_logs",
+      "consumed_by": [
+        "process_logs"
+      ]
+    },
+    "system_metrics": {
+      "name": "system_metrics",
+      "produced_by": "extract_metrics",
+      "consumed_by": [
+        "process_metrics"
+      ]
+    },
+    "user_events": {
+      "name": "user_events",
+      "produced_by": "extract_events",
+      "consumed_by": [
+        "process_events"
+      ]
+    },
+    "parsed_logs": {
+      "name": "parsed_logs",
+      "produced_by": "process_logs",
+      "consumed_by": [
+        "merge_all"
+      ]
+    },
+    "aggregated_metrics": {
+      "name": "aggregated_metrics",
+      "produced_by": "process_metrics",
+      "consumed_by": [
+        "merge_all"
+      ]
+    },
+    "enriched_events": {
+      "name": "enriched_events",
+      "produced_by": "process_events",
+      "consumed_by": [
+        "merge_all"
+      ]
+    },
+    "unified_dataset": {
+      "name": "unified_dataset",
+      "produced_by": "merge_all",
+      "consumed_by": [
+        "load_analytics"
+      ]
+    }
+  },
+  "tasks": [
+    {
+      "id": "extract_logs",
+      "type": "EXTRACT",
+      "inputs": [],
+      "outputs": [
+        "app_logs"
+      ],
+      "depends_on": [],
+      "source_line": 4,
+      "state": "pending"
+    },
+    {
+      "id": "extract_metrics",
+      "type": "EXTRACT",
+      "inputs": [],
+      "outputs": [
+        "system_metrics"
+      ],
+      "depends_on": [],
+      "source_line": 8,
+      "state": "pending"
+    },
+    {
+      "id": "extract_events",
+      "type": "EXTRACT",
+      "inputs": [],
+      "outputs": [
+        "user_events"
+      ],
+      "depends_on": [],
+      "source_line": 12,
+      "state": "pending"
+    },
+    {
+      "id": "process_logs",
+      "type": "TRANSFORM",
+      "inputs": [
+        "app_logs"
+      ],
+      "outputs": [
+        "parsed_logs"
+      ],
+      "depends_on": [
+        "extract_logs"
+      ],
+      "source_line": 16,
+      "state": "pending"
+    },
+    {
+      "id": "process_metrics",
+      "type": "TRANSFORM",
+      "inputs": [
+        "system_metrics"
+      ],
+      "outputs": [
+        "aggregated_metrics"
+      ],
+      "depends_on": [
+        "extract_metrics"
+      ],
+      "source_line": 22,
+      "state": "pending"
+    },
+    {
+      "id": "process_events",
+      "type": "TRANSFORM",
+      "inputs": [
+        "user_events"
+      ],
+      "outputs": [
+        "enriched_events"
+      ],
+      "depends_on": [
+        "extract_events"
+      ],
+      "source_line": 28,
+      "state": "pending"
+    },
+    {
+      "id": "merge_all",
+      "type": "TRANSFORM",
+      "inputs": [
+        "parsed_logs",
+        "aggregated_metrics",
+        "enriched_events"
+      ],
+      "outputs": [
+        "unified_dataset"
+      ],
+      "depends_on": [
+        "process_logs",
+        "process_metrics",
+        "process_events"
+      ],
+      "source_line": 34,
+      "state": "pending"
+    },
+    {
+      "id": "load_analytics",
+      "type": "LOAD",
+      "inputs": [
+        "unified_dataset"
+      ],
+      "outputs": [],
+      "depends_on": [
+        "merge_all"
+      ],
+      "source_line": 40,
+      "state": "pending"
+    }
+  ],
+  "dependencies": {
+    "extract_logs": [],
+    "extract_metrics": [],
+    "extract_events": [],
+    "process_logs": [
+      "extract_logs"
+    ],
+    "process_metrics": [
+      "extract_metrics"
+    ],
+    "process_events": [
+      "extract_events"
+    ],
+    "merge_all": [
+      "process_logs",
+      "process_metrics",
+      "process_events"
+    ],
+    "load_analytics": [
+      "merge_all"
+    ]
+  },
+  "execution_order": [
+    "extract_metrics",
+    "extract_logs",
+    "extract_events",
+    "process_metrics",
+    "process_logs",
+    "process_events",
+    "merge_all",
+    "load_analytics"
+  ]
+}

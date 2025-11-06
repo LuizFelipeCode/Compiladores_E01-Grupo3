@@ -1,0 +1,43 @@
+# Pipeline com Processamento Paralelo
+# Múltiplas extrações que são processadas em paralelo
+
+task extract_logs: EXTRACT
+  outputs: app_logs
+end
+
+task extract_metrics: EXTRACT
+  outputs: system_metrics
+end
+
+task extract_events: EXTRACT
+  outputs: user_events
+end
+
+task process_logs: TRANSFORM
+  inputs: app_logs
+  outputs: parsed_logs
+  depends_on: extract_logs
+end
+
+task process_metrics: TRANSFORM
+  inputs: system_metrics
+  outputs: aggregated_metrics
+  depends_on: extract_metrics
+end
+
+task process_events: TRANSFORM
+  inputs: user_events
+  outputs: enriched_events
+  depends_on: extract_events
+end
+
+task merge_all: TRANSFORM
+  inputs: parsed_logs, aggregated_metrics, enriched_events
+  outputs: unified_dataset
+  depends_on: process_logs, process_metrics, process_events
+end
+
+task load_analytics: LOAD
+  inputs: unified_dataset
+  depends_on: merge_all
+end

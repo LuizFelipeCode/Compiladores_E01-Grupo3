@@ -1,0 +1,17 @@
+# Pipeline Simples - ETL básico
+# Exemplo linear: Extract -> Transform -> Load
+
+task extract_source: EXTRACT
+  outputs: raw_data
+end
+
+task transform_data: TRANSFORM
+  inputs: raw_data
+  outputs: processed_data
+  depends_on: extract_source
+end
+
+task load_target: LOAD
+  inputs: processed_data
+  depends_on: transform_data
+end

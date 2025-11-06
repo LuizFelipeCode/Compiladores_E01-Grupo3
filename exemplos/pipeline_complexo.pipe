@@ -1,0 +1,50 @@
+# Pipeline Complexo - ETL para Analytics
+# Exemplo com múltiplas fontes e transformações
+
+task extract_database: EXTRACT
+  outputs: raw_customers, raw_orders
+end
+
+task extract_api: EXTRACT
+  outputs: raw_products
+end
+
+task clean_customers: TRANSFORM
+  inputs: raw_customers
+  outputs: clean_customers
+  depends_on: extract_database
+end
+
+task clean_orders: TRANSFORM
+  inputs: raw_orders
+  outputs: clean_orders
+  depends_on: extract_database
+end
+
+task clean_products: TRANSFORM
+  inputs: raw_products
+  outputs: clean_products
+  depends_on: extract_api
+end
+
+task enrich_orders: TRANSFORM
+  inputs: clean_orders, clean_customers, clean_products
+  outputs: enriched_orders
+  depends_on: clean_orders, clean_customers, clean_products
+end
+
+task aggregate_metrics: TRANSFORM
+  inputs: enriched_orders
+  outputs: daily_metrics, monthly_metrics
+  depends_on: enrich_orders
+end
+
+task load_warehouse: LOAD
+  inputs: enriched_orders, daily_metrics, monthly_metrics
+  depends_on: aggregate_metrics
+end
+
+task load_cache: LOAD
+  inputs: clean_customers, clean_products
+  depends_on: clean_customers, clean_products
+end

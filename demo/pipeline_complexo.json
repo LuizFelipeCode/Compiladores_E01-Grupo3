@@ -1,0 +1,251 @@
+{
+  "metadata": {
+    "compiler": "PipeLang Compiler v0.2",
+    "source_file": "exemplos/pipeline_complexo.pipe",
+    "generated_at": "2025-11-06T16:54:28.719829",
+    "total_tasks": 9,
+    "format_version": "1.0"
+  },
+  "artifacts": {
+    "raw_customers": {
+      "name": "raw_customers",
+      "produced_by": "extract_database",
+      "consumed_by": [
+        "clean_customers"
+      ]
+    },
+    "raw_orders": {
+      "name": "raw_orders",
+      "produced_by": "extract_database",
+      "consumed_by": [
+        "clean_orders"
+      ]
+    },
+    "raw_products": {
+      "name": "raw_products",
+      "produced_by": "extract_api",
+      "consumed_by": [
+        "clean_products"
+      ]
+    },
+    "clean_customers": {
+      "name": "clean_customers",
+      "produced_by": "clean_customers",
+      "consumed_by": [
+        "enrich_orders",
+        "load_cache"
+      ]
+    },
+    "clean_orders": {
+      "name": "clean_orders",
+      "produced_by": "clean_orders",
+      "consumed_by": [
+        "enrich_orders"
+      ]
+    },
+    "clean_products": {
+      "name": "clean_products",
+      "produced_by": "clean_products",
+      "consumed_by": [
+        "enrich_orders",
+        "load_cache"
+      ]
+    },
+    "enriched_orders": {
+      "name": "enriched_orders",
+      "produced_by": "enrich_orders",
+      "consumed_by": [
+        "aggregate_metrics",
+        "load_warehouse"
+      ]
+    },
+    "daily_metrics": {
+      "name": "daily_metrics",
+      "produced_by": "aggregate_metrics",
+      "consumed_by": [
+        "load_warehouse"
+      ]
+    },
+    "monthly_metrics": {
+      "name": "monthly_metrics",
+      "produced_by": "aggregate_metrics",
+      "consumed_by": [
+        "load_warehouse"
+      ]
+    }
+  },
+  "tasks": [
+    {
+      "id": "extract_database",
+      "type": "EXTRACT",
+      "inputs": [],
+      "outputs": [
+        "raw_customers",
+        "raw_orders"
+      ],
+      "depends_on": [],
+      "source_line": 4,
+      "state": "pending"
+    },
+    {
+      "id": "extract_api",
+      "type": "EXTRACT",
+      "inputs": [],
+      "outputs": [
+        "raw_products"
+      ],
+      "depends_on": [],
+      "source_line": 8,
+      "state": "pending"
+    },
+    {
+      "id": "clean_customers",
+      "type": "TRANSFORM",
+      "inputs": [
+        "raw_customers"
+      ],
+      "outputs": [
+        "clean_customers"
+      ],
+      "depends_on": [
+        "extract_database"
+      ],
+      "source_line": 12,
+      "state": "pending"
+    },
+    {
+      "id": "clean_orders",
+      "type": "TRANSFORM",
+      "inputs": [
+        "raw_orders"
+      ],
+      "outputs": [
+        "clean_orders"
+      ],
+      "depends_on": [
+        "extract_database"
+      ],
+      "source_line": 18,
+      "state": "pending"
+    },
+    {
+      "id": "clean_products",
+      "type": "TRANSFORM",
+      "inputs": [
+        "raw_products"
+      ],
+      "outputs": [
+        "clean_products"
+      ],
+      "depends_on": [
+        "extract_api"
+      ],
+      "source_line": 24,
+      "state": "pending"
+    },
+    {
+      "id": "enrich_orders",
+      "type": "TRANSFORM",
+      "inputs": [
+        "clean_orders",
+        "clean_customers",
+        "clean_products"
+      ],
+      "outputs": [
+        "enriched_orders"
+      ],
+      "depends_on": [
+        "clean_orders",
+        "clean_customers",
+        "clean_products"
+      ],
+      "source_line": 30,
+      "state": "pending"
+    },
+    {
+      "id": "aggregate_metrics",
+      "type": "TRANSFORM",
+      "inputs": [
+        "enriched_orders"
+      ],
+      "outputs": [
+        "daily_metrics",
+        "monthly_metrics"
+      ],
+      "depends_on": [
+        "enrich_orders"
+      ],
+      "source_line": 36,
+      "state": "pending"
+    },
+    {
+      "id": "load_warehouse",
+      "type": "LOAD",
+      "inputs": [
+        "enriched_orders",
+        "daily_metrics",
+        "monthly_metrics"
+      ],
+      "outputs": [],
+      "depends_on": [
+        "aggregate_metrics"
+      ],
+      "source_line": 42,
+      "state": "pending"
+    },
+    {
+      "id": "load_cache",
+      "type": "LOAD",
+      "inputs": [
+        "clean_customers",
+        "clean_products"
+      ],
+      "outputs": [],
+      "depends_on": [
+        "clean_customers",
+        "clean_products"
+      ],
+      "source_line": 47,
+      "state": "pending"
+    }
+  ],
+  "dependencies": {
+    "extract_database": [],
+    "extract_api": [],
+    "clean_customers": [
+      "extract_database"
+    ],
+    "clean_orders": [
+      "extract_database"
+    ],
+    "clean_products": [
+      "extract_api"
+    ],
+    "enrich_orders": [
+      "clean_orders",
+      "clean_customers",
+      "clean_products"
+    ],
+    "aggregate_metrics": [
+      "enrich_orders"
+    ],
+    "load_warehouse": [
+      "aggregate_metrics"
+    ],
+    "load_cache": [
+      "clean_customers",
+      "clean_products"
+    ]
+  },
+  "execution_order": [
+    "extract_database",
+    "extract_api",
+    "clean_customers",
+    "clean_orders",
+    "clean_products",
+    "enrich_orders",
+    "load_cache",
+    "aggregate_metrics",
+    "load_warehouse"
+  ]
+}

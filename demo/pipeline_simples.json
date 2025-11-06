@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "compiler": "PipeLang Compiler v0.2",
+    "source_file": "exemplos/pipeline_simples.pipe",
+    "generated_at": "2025-11-06T16:53:51.001249",
+    "total_tasks": 3,
+    "format_version": "1.0"
+  },
+  "artifacts": {
+    "raw_data": {
+      "name": "raw_data",
+      "produced_by": "extract_source",
+      "consumed_by": [
+        "transform_data"
+      ]
+    },
+    "processed_data": {
+      "name": "processed_data",
+      "produced_by": "transform_data",
+      "consumed_by": [
+        "load_target"
+      ]
+    }
+  },
+  "tasks": [
+    {
+      "id": "extract_source",
+      "type": "EXTRACT",
+      "inputs": [],
+      "outputs": [
+        "raw_data"
+      ],
+      "depends_on": [],
+      "source_line": 4,
+      "state": "pending"
+    },
+    {
+      "id": "transform_data",
+      "type": "TRANSFORM",
+      "inputs": [
+        "raw_data"
+      ],
+      "outputs": [
+        "processed_data"
+      ],
+      "depends_on": [
+        "extract_source"
+      ],
+      "source_line": 8,
+      "state": "pending"
+    },
+    {
+      "id": "load_target",
+      "type": "LOAD",
+      "inputs": [
+        "processed_data"
+      ],
+      "outputs": [],
+      "depends_on": [
+        "transform_data"
+      ],
+      "source_line": 14,
+      "state": "pending"
+    }
+  ],
+  "dependencies": {
+    "extract_source": [],
+    "transform_data": [
+      "extract_source"
+    ],
+    "load_target": [
+      "transform_data"
+    ]
+  },
+  "execution_order": [
+    "extract_source",
+    "transform_data",
+    "load_target"
+  ]
+}

@@ -1,0 +1,8 @@
+
+### Divisão de Responsabilidades SEMANA 02
+
+- **Caio Vasconcelos Araújo Figueiredo**: Implementação do gerador de código intermediário (`codegen.py`), algoritmo de ordenação topológica e geração de representação JSON
+
+- **Gabriel Oliveira Evangelista Luiz**: Criação de exemplos de pipelines (`pipeline_simples.pipe`, `pipeline_complexo.pipe`, `pipeline_paralelo.pipe`) e validação da geração de IR
+
+- **Felipe Prudente Borges**: Correção do parser para suporte a comentários, geração de pseudo-código e refinamento da saída do compilador
