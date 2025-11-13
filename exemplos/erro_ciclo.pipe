@@ -1,0 +1,13 @@
+pipeline com_ciclo {
+    task tarefa_a {
+        from 'fonte'
+        to 'saida_a'
+        after tarefa_b
+    };
+
+    task tarefa_b {
+        from 'saida_a'
+        to 'saida_b'
+        after tarefa_a
+    }
+}

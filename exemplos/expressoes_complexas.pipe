@@ -1,0 +1,27 @@
+pipeline analytics {
+    task extrair {
+        from 'api_dados'
+        to 'dados_raw'
+    };
+
+    task filtrar_premium {
+        from 'dados_raw'
+        filter tipo == 'premium' and (valor > 1000 or qtd >= 10) and status != 'cancelado'
+        to 'clientes_premium'
+        after extrair
+    };
+
+    task filtrar_basico {
+        from 'dados_raw'
+        filter tipo == 'basico' and valor < 1000 and idade >= 18
+        to 'clientes_basico'
+        after extrair
+    };
+
+    task consolidar {
+        from 'clientes_premium'
+        map total = 'sum(valor)'
+        to 'relatorio_final'
+        after filtrar_premium, filtrar_basico
+    }
+}

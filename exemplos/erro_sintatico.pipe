@@ -1,0 +1,7 @@
+pipeline erro_sintaxe {
+    task tarefa1 {
+        from 'fonte'
+        filter idade > 18 and
+        to 'saida'
+    }
+}

@@ -1,0 +1,26 @@
+pipeline vendas {
+    task extrair_dados {
+        from 'database_vendas'
+        to 'dados_brutos'
+    };
+
+    task filtrar_clientes {
+        from 'dados_brutos'
+        filter idade >= 18 and status == 'ativo' or vip == 'true'
+        to 'clientes_validos'
+        after extrair_dados
+    };
+
+    task calcular_metricas {
+        from 'clientes_validos'
+        map total_vendas = 'sum(vendas)'
+        to 'metricas'
+        after filtrar_clientes
+    };
+
+    task carregar_warehouse {
+        from 'metricas'
+        to 'data_warehouse'
+        after calcular_metricas
+    }
+}

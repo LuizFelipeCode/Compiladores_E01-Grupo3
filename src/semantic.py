@@ -39,7 +39,6 @@ class ParserNaive:
 
     @staticmethod
     def remove_comment(text):
-        """Remove comentários (# ...) de uma linha"""
         comment_pos = text.find('#')
         if comment_pos != -1:
             return text[:comment_pos].strip()
@@ -52,7 +51,6 @@ class ParserNaive:
         tasks = []
         cur = None
         for idx, line in enumerate(lines, start=1):
-            # Remover comentários antes de processar
             line_stripped = self.remove_comment(line)
 
             if not line_stripped:
