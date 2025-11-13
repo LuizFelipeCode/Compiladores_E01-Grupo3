@@ -1,4 +1,7 @@
 import sys
+import argparse
+import os
+import tempfile
 from lexer import AnalisadorLexico, ErroLexico
 from parser import AnalisadorSintatico, ErroSintatico, Pipeline, Tarefa
 from semantic import Task, SymbolTable, SemanticAnalyzer, dump_symbol_table
@@ -142,14 +145,21 @@ class PipeLangCompiler:
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Uso: python src/compiler.py <arquivo.pipe> [saida.json]")
-        print("  arquivo.pipe: arquivo fonte PipeLang")
-        print("  saida.json:   (opcional) arquivo de saida para IR")
-        sys.exit(1)
+    # Parse argumentos de linha de comando
+    parser = argparse.ArgumentParser(
+        description='Compilador PipeLang - Compila pipelines de dados ETL',
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+    parser.add_argument('source', help='Arquivo fonte .pipe')
+    parser.add_argument('output', nargs='?', help='Arquivo de saida .json (opcional)')
+    parser.add_argument('--simulate', '-s', action='store_true',
+                       help='Executar simulador apos compilacao bem-sucedida')
 
-    source_path = sys.argv[1]
-    output_path = sys.argv[2] if len(sys.argv) > 2 else None
+    args = parser.parse_args()
+
+    source_path = args.source
+    output_path = args.output
+    run_simulator = args.simulate
 
     print("=" * 60)
     print("COMPILADOR PIPELANG")
@@ -166,10 +176,49 @@ def main():
         compiler.print_symbol_table()
         compiler.print_pseudo_code()
 
+        # Se output_path foi fornecido, salva a IR
         if output_path:
             compiler.save_ir(output_path)
+            ir_file = output_path
+        else:
+            # Se --simulate mas sem output_path, cria arquivo temporario
+            if run_simulator:
+                # Cria arquivo temporario para a IR
+                temp_fd, ir_file = tempfile.mkstemp(suffix='.json', prefix='pipeline_')
+                os.close(temp_fd)  # Fecha o file descriptor
+                compiler.save_ir(ir_file)
+            else:
+                ir_file = None
 
-        sys.exit(0)
+        # Se flag --simulate ativada, executa o simulador
+        if run_simulator and ir_file:
+            print("\n" + "=" * 60)
+            print("[SIMULATE] Iniciando simulacao do pipeline...")
+            print("=" * 60)
+
+            # Importa e executa o simulador
+            try:
+                from simulator import PipelineSimulator
+                simulator = PipelineSimulator(ir_file)
+                success = simulator.run()
+
+                # Se usou arquivo temporario, remove
+                if not output_path:
+                    try:
+                        os.unlink(ir_file)
+                    except:
+                        pass
+
+                sys.exit(0 if success else 1)
+            except ImportError:
+                print("[ERRO] Nao foi possivel importar o simulador.")
+                print("       Certifique-se de que simulator.py existe em src/")
+                sys.exit(1)
+            except Exception as e:
+                print(f"[ERRO] Erro ao executar simulador: {e}")
+                sys.exit(1)
+        else:
+            sys.exit(0)
     else:
         print("\n" + "=" * 60)
         print("[FALHA] COMPILACAO FALHOU")

@@ -1,0 +1,8 @@
+
+### Divisão de Responsabilidades SEMANA 03
+
+- **Caio Vasconcelos Araújo Figueiredo**: Implementação do simulador (`simulator.py`), classes ArtifactManager, TaskExecutor e PipelineSimulator com lógica de execução e rastreamento de artefatos
+
+- **Gabriel Oliveira Evangelista Luiz**: Validação com exemplos (pipeline_simples, pipeline_paralelo, pipeline_complexo), testes de execução e análise dos resultados
+
+- **Felipe Prudente Borges**: Integração do simulador com o compilador (flag --simulate), documentação e refinamento da interface CLI
